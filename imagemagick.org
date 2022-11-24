@@ -1,0 +1,54 @@
+* Batch Resize
+Creates a subdirectory =resized=, where it places a resized version of
+every =.jpg= file from the current directory. Resizes the largest side
+to 200 pixels 
+#+BEGIN_SRC
+mkdir resized -p;
+for file in *.jpg; do\
+  echo "resizing $file";\
+  convert $file -resize 200 resized/$file;\
+done
+#+END_SRC
+* Advanced Batch Resize and Rename
+- Creates Subdir resized
+- for each file in current directory, if a file ~./hochkant/output_$filename~ exists, use this, otherwise use the current file.
+- Resize the file and write it to ~resized/$PREFIX_n.jpg~
+  Setup:
+#+BEGIN_SRC
+#let j=0
+prefix=PREFIX;
+#+END_SRC
+
+  Code:
+#+BEGIN_SRC
+mkdir resized -p;
+for file in *.JPG; do\
+  let j+=1;\
+  if test -f ./hochkant/output_$file; then\
+    echo "resizing $file from hochkant-directory";\
+    convert hochkant/output_$file -resize 2000 resized/$(echo $prefix)_$j.jpg;\
+  else\
+    echo "resizing $file";\
+    convert $file -resize 2000 resized/$(echo $prefix)_$j.jpg;\
+  fi
+done
+#+END_SRC
+
+* Convert portrait to landscape, with added streched and blured background, to a given size
+
+set Variables:
+#+BEGIN_SRC
+let width=2000;
+let height=1333;
+let width_landscape=889;
+file=FILENAME;
+#+END_SRC
+
+Code:
+#+BEGIN_SRC
+echo "Create blury-background-landscape-collage for $file" 
+convert $file -scale $(echo $height)x$(echo $width)! -blur 0x15 background_$file;
+convert $file -scale $(echo $height)x$(echo $width_landscape) foreground_$file;
+composite foreground_$file -gravity Center background_$file output_$file;
+#+END_SRC
+
